@@ -1,4 +1,4 @@
-Deployment of siamese SNN for transferring annotation from one annotated experiment to another
+Speed Stress Test for annotating 10 to 10K cells
 ==============================================================================================
 
 Load 10X reference 10k pbmc data
