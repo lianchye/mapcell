@@ -96,4 +96,4 @@ speed.plot=
 speed.plot
 ```
 
-![](./plots/unnamed-chunk-4-1.png)
+![speed.plot](./plots/annot_speed_test.pdf)
