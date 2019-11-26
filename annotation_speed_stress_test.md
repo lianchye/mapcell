@@ -73,42 +73,6 @@ for(i in 1L:length(cell_count_range)){ # i=1
 }
 ```
 
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
-    ## embedding start
-
-    ## annotating
-
 Plot the time changes with number of cells
 ------------------------------------------
 
@@ -132,4 +96,4 @@ speed.plot=
 speed.plot
 ```
 
-![](annotation_speed_stress_test_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](./plots/unnamed-chunk-4-1.png)
