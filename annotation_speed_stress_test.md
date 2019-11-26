@@ -96,4 +96,4 @@ speed.plot=
 speed.plot
 ```
 
-![speed.plot](./plots/annot_speed_test.pdf)
+![speed.plot](./plots/annot_speed_test.png)
