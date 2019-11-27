@@ -1,6 +1,6 @@
 ![logo](./mapcell_logo.PNG "mapcell")
 # mapcell
-MapCell: Learning a comparative cell type distance metric with Siamese neural nets with applications towards cell-type identification across experimental datasets [biorxiv](https://www.biorxiv.org/content/10.1101/828699v1)
+MapCell: Learning a comparative cell type distance metric with Siamese neural nets with applications towards cell-type identification across experimental datasets [(biorxiv)](https://www.biorxiv.org/content/10.1101/828699v1) [(pdf)](https://www.biorxiv.org/content/biorxiv/early/2019/11/04/828699.full.pdf)
 
 Features of MapCell are: 
 -	Requires few training examples per cell type (20 cells per cell type was used in this work) 
