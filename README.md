@@ -1,4 +1,4 @@
-# mapcell
+# MapCell
 
 <img src="./mapcell_logo.PNG" alt="logo" title="mapcell" style="zoom:150%;" />
 
@@ -27,7 +27,9 @@ This repository is meant to host the trained models from the above paper and to 
 R notebooks examples are provided in the repository as to illustrate the ease of modding and using the trained models. Current examples includes:
 
 1. [10X count peripheral blood annotation](./deployment_nb.md) and;
-2. [3K PBMC seurat object annotation](./seurat_annotation.md).  
+2. [3K PBMC seurat object annotation](./seurat_annotation.md).
+
+To test out the annotation speed, we have also included a [notebook](./annotation_speed_stress_test) that records the annotation speed.
 
 #### Environment Notes
 
