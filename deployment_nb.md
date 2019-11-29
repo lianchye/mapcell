@@ -114,7 +114,7 @@ before.plot %>% ggsave(plot = .,filename = "./plots/ext10_tsne.png")
 before.plot
 ```
 
-![ext10_tsne](.\plots\ext10_tsne.png)
+![ext10_tsne](./plots/ext10_tsne.png)
 
 ### Now layer on the transferred annotation using SNN model as color
 
@@ -129,7 +129,7 @@ after.plot %>% ggsave(plot = .,filename = "./plots/ext10_annot.png")
 after.plot
 ```
 
-![ext10_annot](.\plots\ext10_annot.png)
+![ext10_annot](./plots/ext10_annot.png)
 
 ### Verify the transferred annotation using independent protein meta-data
 
@@ -157,4 +157,4 @@ ggsave(protein.plot,file="./plots/ext10_protein_verify.png",width = 12,height = 
 protein.plot
 ```
 
-![ext10_protein_verify](C:\Users\Administrator\Documents\GitHub\mapcell\plots\ext10_protein_verify.png)
+![ext10_protein_verify](./plots/ext10_protein_verify.png)
