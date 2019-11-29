@@ -29,7 +29,7 @@ R notebooks examples are provided in the repository as to illustrate the ease of
 1. [10X count peripheral blood annotation](./deployment_nb.md) and;
 2. [3K PBMC seurat object annotation](./seurat_annotation.md).
 
-To test out the annotation speed, we have also included a [notebook](./annotation_speed_stress_test) that records the annotation speed.
+To test out the annotation speed, we have also included a [notebook](./annotation_speed_stress_test.md) that records the annotation speed.
 
 #### Environment Notes
 
