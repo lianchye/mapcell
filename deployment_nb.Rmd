@@ -1,0 +1,109 @@
+---
+title: "R Notebook for using SNN to annotate cells"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+### Deployment of siamese SNN for transferring annotation from one annotated experiment to another
+
+## Case Study 1: Annotating 10X data from manuscript
+```{r,message=FALSE}
+# Load Functions
+source("./annotation_functions/function_lib_annotation.R")
+
+# Read in External counts data matrix
+ext_data.ct=readRDS("./external_data/tenX_data/ext_data_ct.rds")
+ext_data.ct %>% dim() # Check dimensions
+```
+
+
+```{r,message=FALSE,warning=FALSE}
+# Load Trained Model to use and the reference data for transfer of annotation
+gene_names    = "./models_reference/cell_NSCLC/P1_annot_reference/input_genes.csv"%>%  read_csv() %>% pull(symbol)
+model_sel     = "./models_reference/cell_NSCLC/P1_annot_reference/weights.h5"     %>% build_embedding(rna_length = length(gene_names),weights_h5 = .)
+refCells_sel  = "./models_reference/cell_NSCLC/P1_annot_reference/embed_ref.rds"  %>% readRDS()
+metaCells_sel = "./models_reference/cell_NSCLC/P1_annot_reference/meta_ref.rds"   %>% readRDS()
+```
+
+
+```{r,message=FALSE,warning=FALSE,error}
+# Peek at the trained model
+model_sel
+```
+
+
+```{r}
+# Perform Annotation
+annotate_out.df = 
+  annotate_fn_v2(
+    ext_data.ct     = ext_data.ct,                  # External 10X data
+    model_embed     = model_sel,                    # Model trained on P1 data and human annotations
+    model_embed_ref = refCells_sel,                 # Reference cells that were used for training
+    ref_annotation  = metaCells_sel$Major_cell_type # Labels of the reference cells
+  )
+```
+
+
+```{r}
+# Output contains:
+# distance to 21 closest cell [knn_dist] ;
+# the label of the cells [knn_annot] ; 
+# Majority agreement of cell type across the 21 cells [annot_call];
+# Number of reference cell supporting the majority call [annot_cts]
+
+annotate_out_perCell.df = annotate_out.df %>% group_by(cell_bc) %>% group_by(cell_bc) %>% arrange(-annot_cts) %>% slice(1) %>% ungroup()
+annotate_out_perCell.df
+```
+
+```{r}
+# Read in external meta data about cells
+tsne_coord= readRDS("./external_data/tenX_data/ext10x_30_tsne.rds")
+ext10_pro = readRDS("./external_data/tenX_data/pbmc10k_protein_v3_adt.rds")
+plot.df = tsne_coord %>% left_join(annotate_out_perCell.df)
+```
+
+```{r}
+# plotting just the plane t-SNE with no annotation
+before.plot = 
+  plot.df %>% 
+  ggplot(aes(x=X1,y=X2))+
+  geom_point(size=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))
+before.plot %>% ggsave(plot = .,filename = "./plots/ext10_tsne.png")
+before.plot
+```
+
+```{r}
+# Plot the annotated data as colors
+after.plot =plot.df %>% 
+  ggplot(aes(x=X1,y=X2,color=annot_call))+
+  geom_point(size=0.4,alpha=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))
+after.plot %>% ggsave(plot = .,filename = "./plots/ext10_annot.png")
+after.plot
+```
+```{r}
+poi=rownames(ext10_pro)
+
+plot_pro.df=plot.df %>% left_join(data.frame(cell_bc=colnames(ext10_pro)[-1],ext10_pro[,-1] %>% apply(.,2,function(x){log2((x/sum(x)*10^6)+1)}) %>% t()))
+
+plot.list=lapply(poi,function(x){
+  minor_pro.plot=
+  plot_pro.df %>%  
+  ggplot(aes_string(x="X1",y="X2",color=x))+
+  geom_point(size=0.4)+
+  scale_color_viridis_c(name=x,option="A")+
+  coord_equal()+
+  theme_pubclean()
+  return(minor_pro.plot)
+})
+names(plot.list)=poi
+
+plot_sub.list = plot.list[c("CD3","CD14","CD19","CD56")]
+protein.plot=ggarrange(plotlist = plot_sub.list,ncol=length(plot_sub.list),nrow=1)
+ggsave(protein.plot,file="./plots/ext10_protein_verify.png",width = 12,height = 4)
+```
+

@@ -1,0 +1,127 @@
+---
+title: "R Notebook for using SNN to annotate seurat obj"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+### Deployment of siamese SNN for transferring annotation from one annotated experiment to another
+
+
+```{r,message=FALSE}
+# Load Functions
+source("./annotation_functions/function_lib_annotation.R")
+
+# Read in External counts data matrix
+library(Seurat)
+
+#Download the example  seurat object
+destfile="./external_data/seurat_objs/pbmc3k_final_test.rds"
+if(!file.exists(destfile)){
+  dir.create("./external_data/seurat_objs")
+  download.file("https://snn-api-demo-data.s3-ap-southeast-1.amazonaws.com/pbmc3k_final.rds",destfile)
+}
+
+# Read in the seurat object
+seurat_obj   = readRDS("./external_data/seurat_objs/pbmc3k_final.rds")
+
+```
+
+
+```{r,message=FALSE,warning=FALSE}
+# Load Trained Model to use and the reference data for transfer of annotation
+gene_names    = "./models_reference/human_cell_landscape/peri-blood/gene_names.rds" %>% readRDS() 
+model_sel     = "./models_reference/human_cell_landscape/peri-blood/weights.h5"     %>% build_embedding(rna_length = length(gene_names),weights_h5 = .)
+refCells_sel  = "./models_reference/human_cell_landscape/peri-blood/embed_ref.rds"  %>% readRDS()
+metaCells_sel = "./models_reference/human_cell_landscape/peri-blood/meta_ref.rds"   %>% readRDS()
+# Access the gene names in the seurate object to find the common ones with those of the pretrained model to be fed into as inputs
+common_genes  = seurat_obj@raw.data@Dimnames[[1]] %>% intersect(gene_names)
+```
+
+```{r}
+# Number of selected cells 
+sel_cols = 1:ncol(seurat_obj@raw.data)
+
+# Split into chunks of 4000 or less cells
+chunks   = split(sel_cols, ceiling(seq_along(sel_cols)/1000)) 
+
+annot_out=list()
+
+for(i in 1:length(chunks)){
+  
+  # Find the common genes and map those counts over  
+  common.mat      =
+    apply(seurat_obj@raw.data[,chunks[[i]]],2,function(x){
+      api.vec               = rep(0L,length(gene_names))
+      names(api.vec)        = gene_names
+      api.vec[common_genes] = x[common_genes]
+      cell_exp              = as.numeric(api.vec/max(api.vec))
+      return(cell_exp)
+    })
+  rownames(common.mat) = gene_names
+  
+  annotate_cell.list = annotate_fn_v2(common.mat, 
+                                      model_sel,
+                                      refCells_sel,
+                                      metaCells_sel$Celltype_clean,
+                                      neighbors = 21)
+  
+  annot_out[[i]] = 
+    annotate_cell.list  %>% group_by(cell_bc) %>% 
+    arrange(-annot_cts) %>% slice(1) %>% ungroup() %>% arrange(annot_cts)
+
+}
+
+```
+```{r}
+annot_all = 
+  annot_out %>% do.call("rbind",.) %>%
+  group_by(cell_bc) %>% top_n(n=1,wt=-knn_dist)
+
+annot_all
+```
+
+
+```{r}
+combined_annot.df = seurat_obj@meta.data %>% rownames_to_column("cell_bc") %>% left_join(annot_all)
+```
+
+```{r}
+#Append the tsne coords
+plot.df = seurat_obj@dr$tsne@cell.embeddings %>% data.frame() %>% rownames_to_column(var="cell_bc") %>% left_join(combined_annot.df)
+
+before.plot =
+  plot.df %>% 
+  ggplot(aes(x=tSNE_1,y=tSNE_2))+
+  geom_point(size=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))
+
+before.plot %>% ggsave(plot = .,filename = "./plots/seurat_tsne.png")
+before.plot
+```
+```{r}
+# Plot the annotated data as colors
+after.plot =
+  plot.df %>% 
+  ggplot(aes(x=tSNE_1,y=tSNE_2,color=annot_call))+
+  geom_point(size=0.4,alpha=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))+
+  ggtitle("mapcell neural net annotation")
+
+after.plot %>% ggsave(plot = .,filename = "./plots/seurat_annot.png")
+```
+```{r}
+human.plot =
+  plot.df %>% 
+  ggplot(aes(x=tSNE_1,y=tSNE_2,color=ClusterNames_0.6))+
+  geom_point(size=0.4,alpha=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))+
+  ggtitle("seurat human annotation")
+compare.plot = ggarrange(after.plot,human.plot,ncol=2)
+compare.plot %>% ggsave("./plots/seurat_compare.png",.,width = 18,height = 8)
+compare.plot
+```
+
