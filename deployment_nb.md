@@ -1,7 +1,9 @@
-### Deployment of siamese SNN for transferring annotation from one annotated experiment to another
+# Deployment of siamese SNN for transferring annotation from an annotated experiment to a non-annotated one
 
 Case Study 1: Annotating 10X data from manuscript
 -------------------------------------------------
+
+### Source function and load the unannotated external data
 
 ``` r
 # Load Functions
@@ -14,6 +16,8 @@ ext_data.ct %>% dim() # Check dimensions
 
     ## [1] 33694  7865
 
+### Load up the trained models 
+
 ``` r
 # Load Trained Model to use and the reference data for transfer of annotation
 gene_names    = "./models_reference/cell_NSCLC/P1_annot_reference/input_genes.csv"%>%  read_csv() %>% pull(symbol)
@@ -21,6 +25,8 @@ model_sel     = "./models_reference/cell_NSCLC/P1_annot_reference/weights.h5"   
 refCells_sel  = "./models_reference/cell_NSCLC/P1_annot_reference/embed_ref.rds"  %>% readRDS()
 metaCells_sel = "./models_reference/cell_NSCLC/P1_annot_reference/meta_ref.rds"   %>% readRDS()
 ```
+
+### Check model structure
 
 ``` r
 # Peek at the trained model
@@ -40,6 +46,8 @@ model_sel
     ## Non-trainable params: 0
     ## ___________________________________________________________________________
 
+### Run annotation
+
 ``` r
 # Perform Annotation
 annotate_out.df = 
@@ -52,8 +60,10 @@ annotate_out.df =
 ```
 
     ## embedding start
-
+    
     ## annotating
+
+### Understanding the output
 
 ``` r
 # Output contains:
@@ -80,3 +90,71 @@ annotate_out_perCell.df
     ##  9 AAACCCATCCGATGTA bT cells   0.00607     bT cells          16
     ## 10 AAACCCATCTCAACGA bNK cells  0.00000552  bT cells          16
     ## # ... with 7,855 more rows
+
+### Read in meta-data to evaluate the results of the annotation using mapcell
+
+```{r}
+# Read in external meta data about cells
+tsne_coord= readRDS("./external_data/tenX_data/ext10x_30_tsne.rds")
+ext10_pro = readRDS("./external_data/tenX_data/pbmc10k_protein_v3_adt.rds")
+plot.df = tsne_coord %>% left_join(annotate_out_perCell.df)
+```
+
+### Unsupervised clustering with no annotation 
+
+```{r}
+# plotting just the plane t-SNE with no annotation
+before.plot = 
+  plot.df %>% 
+  ggplot(aes(x=X1,y=X2))+
+  geom_point(size=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))
+before.plot %>% ggsave(plot = .,filename = "./plots/ext10_tsne.png")
+before.plot
+```
+
+![ext10_tsne](.\plots\ext10_tsne.png)
+
+### Now layer on the transferred annotation using SNN model as color
+
+```{r}
+# Plot the annotated data as colors
+after.plot =plot.df %>% 
+  ggplot(aes(x=X1,y=X2,color=annot_call))+
+  geom_point(size=0.4,alpha=0.7)+
+  theme_pubclean()+
+  guides(color = guide_legend(override.aes = list(size=5,alpha=1)))
+after.plot %>% ggsave(plot = .,filename = "./plots/ext10_annot.png")
+after.plot
+```
+
+![ext10_annot](.\plots\ext10_annot.png)
+
+### Verify the transferred annotation using independent protein meta-data
+
+```{r}
+# Check the annotation of the 
+poi=rownames(ext10_pro)
+
+plot_pro.df=plot.df %>% left_join(data.frame(cell_bc=colnames(ext10_pro)[-1],ext10_pro[,-1] %>% apply(.,2,function(x){log2((x/sum(x)*10^6)+1)}) %>% t()))
+
+plot.list=lapply(poi,function(x){
+  minor_pro.plot=
+  plot_pro.df %>%  
+  ggplot(aes_string(x="X1",y="X2",color=x))+
+  geom_point(size=0.4)+
+  scale_color_viridis_c(name=x,option="A")+
+  coord_equal()+
+  theme_pubclean()
+  return(minor_pro.plot)
+})
+names(plot.list)=poi
+
+plot_sub.list = plot.list[c("CD3","CD14","CD19","CD56")]
+protein.plot=ggarrange(plotlist = plot_sub.list,ncol=length(plot_sub.list),nrow=1)
+ggsave(protein.plot,file="./plots/ext10_protein_verify.png",width = 12,height = 4)
+protein.plot
+```
+
+![ext10_protein_verify](C:\Users\Administrator\Documents\GitHub\mapcell\plots\ext10_protein_verify.png)
