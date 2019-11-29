@@ -33,7 +33,7 @@ To test out the annotation speed, we have also included a [notebook](./annotatio
 
 #### Environment Notes
 
-Main requirement for running the R notebook examples is installation of [keras]( https://github.com/rstudio/keras) library for R. The given examples have been tested to run on a 16 core linux server with 32gb ram where 10 000 cells are annotated in 20 seconds. Higher RAM and better hardware such as availability of GPU will result in performance. However, the models are intentionally made small so as to be able to run fast without GPUs.
+Main requirement for running the R notebook examples is installation of [keras]( https://github.com/rstudio/keras) library for R. The given examples have been tested to run on a 16 core linux server with 32gb ram where 10 000 cells are annotated in 20 seconds. Higher RAM and better hardware such as availability of GPU will result in better performance. However, the models are intentionally made small so as to be able to run fast without GPUs.
 
 ## Citations
 
@@ -53,7 +53,7 @@ Please use the following bibtex entry:
 
 We are working on the release of a series of models featuring major tissue types pending the feedback and demand we received from the community.
 
-Docker images to ease the deployment of annotation are being built. 
+Docker images to abstract away the need for notebooks are being built. 
 
 
 

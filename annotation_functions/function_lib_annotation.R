@@ -48,18 +48,21 @@ annotate_fn_v2 = function(
   knn_index_out  = KernelKnn::knn.index.dist(model_embed_ref,ext_data.embed,k=neighbors,method = method,threads = nos_threads)
   
   message("annotating")
-  snn_annot.df   = lapply(1:nrow(ext_data.embed),function(x){
-    data.frame(cell_bc     = colnames(ext_data.ct)[x],
-               knn_annot   = knn_index_out$test_knn_idx[x,] %>% ref_annotation[.],
-               knn_dist    = knn_index_out$test_knn_dist[x,],
+    snn_annot.df   =
+    data.frame(cell_bc     = rep(colnames(ext_data.ct),each=neighbors),
+               knn_annot   = knn_index_out$test_knn_idx %>% t() %>% as.vector() %>% ref_annotation[.],
+               knn_dist    = knn_index_out$test_knn_dist%>% t() %>% as.vector(),
                stringsAsFactors = FALSE)
+  snn_annot.df = snn_annot.df %>% left_join(
+      snn_annot.df %>%
+        group_by(cell_bc,knn_annot) %>% tally() %>%
+        group_by(cell_bc) %>% slice(which.max(n)) %>% ungroup() %>%
+        rename(annot_call=knn_annot,annot_cts=n)
+    )
     
-  }) %>% do.call("rbind",.) %>%
-    group_by(cell_bc) %>%
-    mutate(annot_call= table(knn_annot) %>% sort(decreasing = TRUE) %>% .[1] %>% names(),
-           annot_cts= table(knn_annot) %>% sort(decreasing = TRUE) %>% .[1] )
   snn_annot.df
 }
+
 
 
 # Sparse PCA
