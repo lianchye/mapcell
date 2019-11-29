@@ -1,6 +1,6 @@
 # Deployment of siamese SNN for transferring annotation from an annotated experiment to a non-annotated one
 
-Case Study 1: Annotating 10X data from manuscript
+Case Study 1: Annotating new 10X data using trained model from manuscript
 -------------------------------------------------
 
 ### Source function and load the unannotated external data
