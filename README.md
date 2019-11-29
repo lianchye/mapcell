@@ -6,7 +6,7 @@
 
 MapCell: Learning a comparative cell type distance metric with *Siamese neural nets* with applications towards cell-type identification across experimental datasets [(biorxiv)](https://www.biorxiv.org/content/10.1101/828699v1) [(pdf)](https://www.biorxiv.org/content/biorxiv/early/2019/11/04/828699.full.pdf)
 
-#### Features  
+## Features  
 
 - Requires few training examples per cell type (20 cells per cell type was used in this work) 
 
@@ -20,7 +20,7 @@ MapCell: Learning a comparative cell type distance metric with *Siamese neural n
 
 - Highly scalable from small (training from cells of a single patient can be used to predict across 6 other patients) to large models (training from the Human Cell Landscape resource that comprises a wide survey of cell types derived from 50 different tissues.) 
 
-#### Usage
+## Usage
 
 This repository is meant to host the trained models from the above paper and to serve as a easy launching point for you to start using these models and begin annotating your own scRNA-seq dataset.  
 
@@ -35,7 +35,7 @@ To test out the annotation speed, we have also included a [notebook](./annotatio
 
 Main requirement for running the R notebook examples is installation of [keras]( https://github.com/rstudio/keras) library for R. The given examples have been tested to run on a 16 core linux server with 32gb ram where 10 000 cells are annotated in 20 seconds. Higher RAM and better hardware such as availability of GPU will result in performance. However, the models are intentionally made small so as to be able to run fast without GPUs.
 
-#### Citations
+## Citations
 
 Please use the following bibtex entry:
 
@@ -49,7 +49,7 @@ Please use the following bibtex entry:
 }
 ```
 
-#### Future Work
+## Future Work
 
 We are working on the release of a series of models featuring major tissue types pending the feedback and demand we received from the community.
 
