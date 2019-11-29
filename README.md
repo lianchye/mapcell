@@ -35,6 +35,12 @@ To test out the annotation speed, we have also included a [notebook](./annotatio
 
 Main requirement for running the R notebook examples is installation of [keras]( https://github.com/rstudio/keras) library for R. The given examples have been tested to run on a 16 core linux server with 32gb ram where 10 000 cells are annotated in 20 seconds. Higher RAM and better hardware such as availability of GPU will result in better performance. However, the models are intentionally made small so as to be able to run fast without GPUs.
 
+#### How models were trained
+
+![Overview](C:\Users\Administrator\Documents\GitHub\mapcell\plots\SNN_overview.PNG)
+
+A. (Top) Siamese network architecture (Bottom) Low-dimensional representation of embedding space. B. The process of the Siamese Network inference. Each cell in the sample set is compared using the SiameseNN metric to a reference set of cells used in the learning stage. The assignment is made to the closest reference type. Cells that do not meet the threshold are flagged as novel cell types. These novel types can be reincorporated into the training set to generate a new SNN or included in the reference set without training.
+
 ## Citations
 
 Please use the following bibtex entry:
