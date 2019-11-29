@@ -37,7 +37,7 @@ Main requirement for running the R notebook examples is installation of [keras](
 
 #### How models were trained
 
-![Overview](C:\Users\Administrator\Documents\GitHub\mapcell\plots\SNN_overview.PNG)
+![Overview](./plots/SNN_overview.PNG)
 
 A. (Top) Siamese network architecture (Bottom) Low-dimensional representation of embedding space. B. The process of the Siamese Network inference. Each cell in the sample set is compared using the SiameseNN metric to a reference set of cells used in the learning stage. The assignment is made to the closest reference type. Cells that do not meet the threshold are flagged as novel cell types. These novel types can be reincorporated into the training set to generate a new SNN or included in the reference set without training.
 
