@@ -31,6 +31,16 @@ R notebooks examples are provided in the repository as to illustrate the ease of
 
 To test out the annotation speed, we have also included a [notebook](./annotation_speed_stress_test.md) that records the annotation speed.
 
+#### API implementation for annotation of a single cell
+
+We have made available an API deploying the Peripheral Blood trained model to identify different PBMC blood types. This API takes in a single cell vector and returns the predicted PMC cell type. An example curl call to the API is shown below:
+
+```bash
+curl --data @demo.json http://13.229.250.159:8000/predict 
+```
+
+[Demo data](https://snn-api-demo-data.s3-ap-southeast-1.amazonaws.com/demo.json) is in JSON format and arranged in a particular gene vector format. The genes are ordered in this particular order specified in this [csv](https://snn-api-demo-data.s3-ap-southeast-1.amazonaws.com/gene_names.csv) file. 
+
 #### Environment Notes
 
 Main requirement for running the R notebook examples is installation of [keras]( https://github.com/rstudio/keras) library for R. The given examples have been tested to run on a 16 core linux server with 32gb ram where 10 000 cells are annotated in 20 seconds. Higher RAM and better hardware such as availability of GPU will result in better performance. However, the models are intentionally made small so as to be able to run fast without GPUs.
