@@ -4,7 +4,7 @@
 
 #  <a href="https://f1000.com/prime/736854052?bd=1" target="_blank"><img src="https://s3.amazonaws.com/cdn.f1000.com/images/badges/badgef1000.gif" alt="Access the recommendation on F1000Prime" id="bg" /></a>  ![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)
 
-MapCell: Learning a comparative cell type distance metric with *Siamese neural nets* with applications towards cell-type identification across experimental datasets [(biorxiv)](https://www.biorxiv.org/content/10.1101/828699v1) [(pdf)](https://www.biorxiv.org/content/biorxiv/early/2019/11/04/828699.full.pdf)
+MapCell: Learning a comparative cell type distance metric with *Siamese neural nets* with applications towards cell-type identification across experimental datasets [(Frontiers in Cell and Developmental Biology)](https://www.frontiersin.org/articles/10.3389/fcell.2021.767897/full) [(pdf)](https://www.biorxiv.org/content/biorxiv/early/2019/11/04/828699.full.pdf)
 
 ## Features  
 
